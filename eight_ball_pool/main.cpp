@@ -16,11 +16,13 @@ const int SCREEN_HEIGHT = 768;
 int main(int argc, const char * argv[])
 {
     SDL_Window* window = nullptr;
-    SDL_Surface* screenSurface = nullptr;
+    SDL_Renderer* renderer = nullptr;
+    //SDL_Surface* screenSurface = nullptr;
     
     if (SDL_Init(SDL_INIT_VIDEO) < 0)
     {
         std::cout << "SDL FAILED TO INIT." << std::endl;
+        return -1;
     }
     else
     {
@@ -34,14 +36,25 @@ int main(int argc, const char * argv[])
         if (window == NULL)
         {
             std::cout << "WINDOW NOT CREATED.";
+            return -1;
         }
         else
         {
-            screenSurface = SDL_GetWindowSurface(window);
-            SDL_FillRect(screenSurface,
-                         NULL,
-                         SDL_MapRGB(screenSurface->format, 0xFF, 0xFF, 0xFF));
-            SDL_UpdateWindowSurface(window);
+            renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+            
+            if (renderer == NULL)
+            {
+                std::cout << "RENDERER NOT CREATED" << std::endl;
+                return -1;
+            }
+            
+            SDL_SetRenderDrawColor(renderer, 255, 222, 255, SDL_ALPHA_OPAQUE);
+            SDL_RenderClear(renderer);
+            
+            // draw stuff here
+            
+            SDL_RenderPresent(renderer);
+            
             
             SDL_Event e;
             bool quit = false;
@@ -56,10 +69,12 @@ int main(int argc, const char * argv[])
                     }
                 }
             }
+            
+            SDL_DestroyRenderer(renderer);
+            SDL_DestroyWindow(window);
+            SDL_Quit();
+            
+            return 0;
         }
-        
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return 0;
     }
 }
